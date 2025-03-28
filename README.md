@@ -10,6 +10,7 @@ Conceptual notes:
 - create empty tensor of size 'size' with torch.empty(...size)
 - can do multiple dimensions like numpy array: torch.empty(dim1, dim2, dim3)
 - torch.rand(...size)
+    - randomly generated values based on the uniform distrubution
 - torch.zeros(...size)
 - torch.ones(...size)
 - Optional parameter during initiation: dtype=<type>
@@ -48,3 +49,36 @@ Conceptual notes:
     - tensor_name.to(device_name) # device_name is cuda or smtg
 - requires_grad=True in tensor initialization
     - gradient calculation on tensor will be required later
+        - pytorch will create backpropagation computaitonal graph
+    - false by default
+
+#### Autograd
+- torch.randn(...size): random tensor with values based on the normal distribution
+- backpropagation:
+    - forward pass: applies operation, stores output
+        - PyTorch will create gradient function grad_fn as attribute when requires_grad=True
+    - backward pass: calculates gradient using grad_fn
+        - tensor_name.backward() will store gradient as attribute tensor_name.grad
+        - Under the hood, gradients are computed with Jacobian vector matrix
+        - if tensor_name not a scalar, need to define vector and pass into .backward(vector)
+    - ex. y = x + 2
+        - y will have attribute grad_fn=<AddBackward0>
+    - .backward() requires requires_grad=True during initialization
+        - pass vector if tensor_name is not scalar
+        - accumulates gradient onto existing .grad, so zero out gradients if used in a loop
+            - zero out gradients with tensor_name.grad.zero_()
+    - prevent gradient tracking:
+        - 1. tensor_name.requires_grad_(False) modifies in-place requires_grad to False
+        - 2. tensor_name.detach() makes new tensor with requires_grad False
+        - 3. with torch.no_grad():
+                ... do operation without grad ...
+
+#### Backpropagation (Conceptual)
+- dericative chain rule: for z(y(x)), dz/dx = dz/dy * dy/dx
+- Computation Graph
+    - Every operation done on a Tensor, PyTorch does on computation graph
+    - for each operation, define local gradient
+    - for overall gradient, use local gradients and chain rule
+- 1. Forward pass: compute loss
+- 2. Compute local gradients
+- 3. Backward pass: compute dLoss / dWeights using the Chain rule
