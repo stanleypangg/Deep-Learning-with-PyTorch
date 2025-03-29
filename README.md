@@ -83,4 +83,32 @@ Conceptual notes:
 - 2. Compute local gradients
 - 3. Backward pass: compute dLoss / dWeights using the Chain rule
 
-#### Gradient Descent
+#### Training Loop
+- training pipeline:
+    - 1. design model (inputs, output size, forward pass)
+    - 2. construct loss, optimizer
+    - 3. training loop
+- in loop:
+- 1. prediction: forward pass
+- 2. calculate loss
+- 3. gradient: backward pass
+- 4. update weights
+    - use torch.no_grad() to not affect computational graph
+    - zero out graident before next iteration
+
+#### pytorch loss computation
+- import torch.nn
+- nn has predefined loss functions
+    - loss = nn.MSELoss()
+- define optimizer
+    - stochastic gradient descent: optimizer = torch.optim.SGD([list_of_variables_to_optimize], lr=learning_rate)
+        - get variables with model.prameters()
+- update weights in training loop: optimizer.step()
+- optimizer.zero_grad() to zero out gradient in training loop
+- can use pytorch models: model = nn.Linear(input_size, output_size)
+- or make custom model:
+    - class Model_name(nn.Module):
+        - def __init__(self, input_dim, output_dim):
+        - def forward(self, x):
+    - model = Model_name(input_dim, output_dim)
+- model(x_i) to make prediction
