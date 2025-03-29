@@ -82,3 +82,5 @@ Conceptual notes:
 - 1. Forward pass: compute loss
 - 2. Compute local gradients
 - 3. Backward pass: compute dLoss / dWeights using the Chain rule
+
+#### Gradient Descent
