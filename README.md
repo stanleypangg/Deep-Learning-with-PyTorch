@@ -104,7 +104,7 @@ Conceptual notes:
     - stochastic gradient descent: optimizer = torch.optim.SGD([list_of_variables_to_optimize], lr=learning_rate)
         - get variables with model.prameters()
 - update weights in training loop: optimizer.step()
-- optimizer.zero_grad() to zero out gradient in training loop
+- IMPORTANT: optimizer.zero_grad() to zero out gradient in training loop
 - can use pytorch models: model = nn.Linear(input_size, output_size)
 - or make custom model:
     - class Model_name(nn.Module):
@@ -112,3 +112,41 @@ Conceptual notes:
         - def forward(self, x):
     - model = Model_name(input_dim, output_dim)
 - model(x_i) to make prediction
+
+#### Linear regression
+- from sklearn import datasets to generate regression dataset
+    - x_numpy, y_numpy = datasets.make_regression(n_samples, n_features, noise, random_state)
+- make model with: model = nn.Linear(input_size, output_size)
+
+#### Logistic regression
+- from sklearn import datasets to generate binary classification dataset
+    - bc = datasets.load_breast_cancer()
+    - X, y = bc.data, bc.target
+- from sklearn.preprocessing import StandardScaler
+    - scale features
+- from sklearn.model_selection import train_test_split
+    - split dataset
+    - X_train, X_test, y_train, y_test = train_test_split(X, y, test_size, random_State)
+- for logistic regression, should make features 0 mean, 1 variance
+    - sc = StandardScalar()
+    - different functions for training & testing data:
+    - X_train = sc.fit_transform(X_train)
+    - X_test = sc.transform(X_test)
+    - convert X_train, X_test, y_train, y_test to tensors
+    - reshape y tensors with .view()
+- make custom model class:
+    - class LogisticRegression(nn.Module):
+        - def __init__(self, n_input_features):
+            super(LogisticRegression, self).__init__()
+            self.linear = nn.Linear(n_input_features, 1) # layer corresponding to linear regression
+        
+        - def forward(self, x):
+            y_predicted = torch.sigmoid(self.linear(x)) # apply sigmoid activation
+            return y_predicted
+- use custom model: model = LogisticRegression(n_features)
+- use binary cross-entropy loss:
+    - criterion = nn.BCELoss()
+- prediction:
+    - with torch.no_grad():
+        y_predicted = model(X_test)
+        y_predicted_cls = y_predicted.round() # convert predicted probability to class
