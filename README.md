@@ -150,3 +150,43 @@ Conceptual notes:
     - with torch.no_grad():
         y_predicted = model(X_test)
         y_predicted_cls = y_predicted.round() # convert predicted probability to class
+
+#### Dataset, dataloader
+- can use DataSet & DataLoader classes to do batch training
+    - help calculate batches
+- terminology:
+    - epoch = 1 forward and backward pass of all training samples
+    - batch_size = number of training samples in one forward and backword pass
+    - number of iterations = number of passes, each pass using batch_size number of samples
+    - e.g. 100 samples, batch_size = 20 -> 100/20 = 5 iterations per epoch
+- make dataset class:
+    import torch
+    import torchvision
+    from torch.utils.data import Dataset, Dataloader
+    import numpy as np
+    import math
+
+    class WineDataset(Dataset): # custom dataset class
+
+        def __init__(self): # data loading
+            xy = np.loadtxt(location, delimiter=",", dtype=np.float32, skiprows=1)
+            self.x = torch.from_numpy(xy[:, 1:])
+            self.y = torch.from_numpy(xy[:, [0]]) # n_samples, 1
+            self.n_samples = xy.shape[0]
+
+        def __getitem__(self, index): # get observation
+            return self.x[index], self.y[index]
+
+        def __len__(self): # dataset length
+            return self.n_samples
+- use dataloader:
+    dataset = WineDataset()
+    dataloader = DataLoader(dataset=dataset, batch_size=4, shuffle=True, num_workers=2) # num_workers makes it multi-threaded
+- use in training loop:
+    num_epochs = 2
+    total_samples = len(dataset)
+    n_iterations = math.ceil(total_samples/batch_size)
+
+    for epoch in range(num_epochs):
+        for i, (inputs, labels) in enumerate(dataloader):
+            # forward pass -> loss calculation -> backward pass -> update weight
